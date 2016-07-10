@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "io.github.giovibal.grpc";
+option java_outer_classname = "TestSvcProto";
+option objc_class_prefix = "RTG";
+
+package tests;
+
+
+service TestSvc {
+    rpc Test1(TestReq) returns (TestRes) {}
+    rpc Test2(TestReq) returns (stream TestRes) {}
+}
+
+message TestReq {
+    string msg = 1;
+}
+message TestRes {
+    string resp = 1;
+}
