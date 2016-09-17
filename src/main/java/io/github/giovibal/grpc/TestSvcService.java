@@ -45,7 +45,7 @@ public class TestSvcService implements TestSvcGrpc.TestSvc {
         return new StreamObserver<PublishMessage>() {
             @Override
             public void onNext(PublishMessage publishMessage) {
-                addMessage(publishMessage);
+                pubSub.publish(publishMessage);
                 PublishAckMessage publishAckMessage = PublishAckMessage.newBuilder()
                         .setId(publishMessage.getId())
                         .build();
@@ -66,38 +66,16 @@ public class TestSvcService implements TestSvcGrpc.TestSvc {
 
     @Override
     public void subscribe(SubscribeMessage sub, StreamObserver<PublishMessage> responseObserver) {
-        String topic = sub.getTopic();
-        while (true) {
-            PublishMessage pm = getNextMessage(topic);
-            if(pm != null) {
-                responseObserver.onNext(pm);
+        pubSub.subscribe(sub, new PubSub.Listener() {
+            @Override
+            public void onMessage(PublishMessage m) {
+                responseObserver.onNext(m);
             }
-        }
+        });
     }
 
-    private LinkedHashMap<String, Queue<PublishMessage>> bus = new LinkedHashMap<>();
-    private void addMessage(PublishMessage m) {
-        if(bus.containsKey(m.getTopic())) {
-            Queue<PublishMessage> messages = bus.get(m.getTopic());
-            if(messages == null) {
-                messages = new ConcurrentLinkedDeque<>();
-            }
-            messages.add(m);
-            bus.put(m.getTopic(), messages);
-        }
-        else {
-            Queue<PublishMessage> messages = new ConcurrentLinkedDeque<>();
-            messages.add(m);
-            bus.put(m.getTopic(), messages);
-        }
-    }
+    private PubSub pubSub = new PubSub();
 
-    private PublishMessage getNextMessage(String topic) {
-        if(bus.containsKey(topic)) {
-            return bus.get(topic).poll();
-        }
-        return null;
-    }
 
     public static void main(String[] args) throws IOException, InterruptedException {
         ServerServiceDefinition ssd = TestSvcGrpc.bindService(new TestSvcService());

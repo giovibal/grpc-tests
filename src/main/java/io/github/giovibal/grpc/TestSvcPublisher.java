@@ -46,14 +46,14 @@ public class TestSvcPublisher {
         StreamObserver<PublishMessage> requestObserver = asyncStub.publish(responseObserver);
         try {
             // Send numPoints points randomly selected from the features list.
-            for (int i = 0; i < 10; ++i) {
+            for (int i = 0; i < 1000000; ++i) {
                 PublishMessage pm = PublishMessage.newBuilder()
                         .setId(i)
                         .setTopic("test/topic")
                         .setPayload("una prova "+ i)
                         .build();
                 requestObserver.onNext(pm);
-                Thread.sleep(500);
+//                Thread.sleep(500);
                 if (finishLatch.getCount() == 0) {
                     // RPC completed or errored before we finished sending.
                     // Sending further requests won't error, but they will just be thrown away.
