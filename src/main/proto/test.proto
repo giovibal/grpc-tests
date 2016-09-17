@@ -11,6 +11,8 @@ package tests;
 service TestSvc {
     rpc Test1(TestReq) returns (TestRes) {}
     rpc Test2(TestReq) returns (stream TestRes) {}
+    rpc Publish(stream PublishMessage) returns (stream PublishAckMessage) {}
+    rpc Subscribe(SubscribeMessage) returns (stream PublishMessage) {}
 }
 
 message TestReq {
@@ -18,4 +20,15 @@ message TestReq {
 }
 message TestRes {
     string resp = 1;
+}
+message PublishMessage {
+    int64 id = 1;
+    string topic = 2;
+    string payload= 3;
+}
+message PublishAckMessage {
+    int64 id = 1;
+}
+message SubscribeMessage {
+    string topic = 1;
 }

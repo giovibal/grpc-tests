@@ -59,6 +59,11 @@ public class TestSvcClient {
                 System.out.println("completed.");
                 finishFuture.set(null);
             }
+
+            @Override
+            public void setMessageCompression(boolean b) {
+
+            }
         });
 
 //        while (true) {
